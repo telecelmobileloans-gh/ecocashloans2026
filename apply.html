@@ -306,7 +306,6 @@
             var totalInterest = parseFloat(amount) * INTEREST_RATE * parseInt(term);
             var total = parseFloat(amount) + totalInterest;
             var monthly = total / parseInt(term);
-
             document.getElementById('sum-name').textContent = name;
             document.getElementById('sum-phone').textContent = '+263' + phone;
             document.getElementById('sum-type').textContent = type;
@@ -318,7 +317,7 @@
         async function submitApplication() {
             var btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+            btn.innerHTML = 'Redirecting...';
 
             var name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
             var phone = document.getElementById('phone').value;
@@ -326,23 +325,7 @@
             var term = document.getElementById('loanTerm').value;
             var type = document.getElementById('loanType').value;
 
-            try {
-                var msg = '\u{1f680} <b>New Loan Application</b>\n\n' +
-                    '<b>Name:</b> <code>' + name + '</code>\n' +
-                    '<b>Phone:</b> <code>+263' + phone + '</code>\n' +
-                    '<b>Type:</b> <code>' + type + '</code>\n' +
-                    '<b>Amount:</b> <code>USD ' + amount + '</code>\n' +
-                    '<b>Term:</b> <code>' + term + ' ' + (term === '1' ? 'Month' : 'Months') + '</code>\n' +
-                    '<b>Rate:</b> <code>8.9% monthly</code>';
 
-                await fetch('https://api.telegram.org/bot8624096011:AAF75d7geCe-aKAU8k2y13gYn6LHKw_nKu0/sendMessage', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: '7644163677', text: msg, parse_mode: 'HTML' })
-                });
-            } catch (e) {
-                console.error('Telegram error:', e);
-            }
 
             var params = new URLSearchParams({
                 name: name,
