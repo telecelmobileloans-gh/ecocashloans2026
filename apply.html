@@ -103,8 +103,9 @@
             transition: all 0.3s;
             font-family: inherit;
         }
+        .form-control:read-only { background-color: rgba(0,0,0,0.03); color: var(--muted); cursor: not-allowed; }
         select.form-control, textarea.form-control { padding-left: 15px; }
-        .form-control:focus { border-color: var(--blue-light); background-color: var(--white); box-shadow: 0 0 0 4px rgba(0,51,102,0.1); }
+        .form-control:focus:not(:read-only) { border-color: var(--blue-light); background-color: var(--white); box-shadow: 0 0 0 4px rgba(0,51,102,0.1); }
 
         .summary-box {
             background: rgba(255,255,255,0.9);
@@ -156,7 +157,7 @@
     <div class="form-container">
         <div class="form-header">
             <h2>Loan Application</h2>
-            <p id="step-indicator">Step 1: Loan Details</p>
+            <p id="step-indicator">Step 1: Personal Info</p>
             <div class="progress-bar">
                 <div class="progress-segment active" id="prog-1"></div>
                 <div class="progress-segment" id="prog-2"></div>
@@ -165,44 +166,8 @@
         </div>
 
         <form id="loanForm">
-            <!-- Step 1: Loan Details -->
+            <!-- Step 1: Personal Info -->
             <div class="form-step active" id="step-1">
-                <div class="form-group">
-                    <label>Loan Type</label>
-                    <select class="form-control" id="loanType" required>
-                        <option value="" disabled selected>Select a loan type...</option>
-                        <option value="Personal Loan">Personal Loan</option>
-                        <option value="Business/SME Loan">Business/SME Loan</option>
-                        <option value="Education/Student Loan">Education/Student Loan</option>
-                        <option value="Emergency/Medical Loan">Emergency/Medical Loan</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Loan Amount (USD)</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-money-bill-wave"></i>
-                        <input type="number" class="form-control" id="loanAmount" placeholder="e.g. 2500" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Repayment Term</label>
-                    <select class="form-control" id="loanTerm" required>
-                        <option value="" disabled selected>Select duration...</option>
-                        <option value="1">1 Month</option>
-                        <option value="2">2 Months</option>
-                        <option value="3">3 Months</option>
-                        <option value="4">4 Months</option>
-                        <option value="5">5 Months</option>
-                        <option value="6">6 Months</option>
-                    </select>
-                </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next Step <i class="fa-solid fa-arrow-right"></i></button>
-                </div>
-            </div>
-
-            <!-- Step 2: Personal Info -->
-            <div class="form-step" id="step-2">
                 <div class="name-row">
                     <div class="form-group">
                         <label>First Name</label>
@@ -220,10 +185,41 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Phone Number</label>
+                    <label>Loan Purpose</label>
+                    <select class="form-control" id="loanType" required>
+                        <option value="" disabled selected>Select a purpose...</option>
+                        <option value="Personal Loan">Personal Loan</option>
+                        <option value="Business/SME Loan">Business/SME Loan</option>
+                        <option value="Education/Student Loan">Education/Student Loan</option>
+                        <option value="Emergency/Medical Loan">Emergency/Medical Loan</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next Step <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Review Selection -->
+            <div class="form-step" id="step-2">
+                <div class="form-group">
+                    <label>EcoCash Number</label>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-phone"></i>
-                        <input type="tel" class="form-control" id="phone" placeholder="e.g. 771234567" inputmode="numeric" maxlength="9" required>
+                        <input type="tel" class="form-control" id="phone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Loan Amount (USD)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                        <input type="text" class="form-control" id="loanAmount" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Repayment Term</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-calendar"></i>
+                        <input type="text" class="form-control" id="loanTerm" readonly>
                     </div>
                 </div>
                 <div class="button-group">
@@ -238,12 +234,12 @@
                     <h4 style="margin-bottom: 14px; font-size: 15px; color: var(--blue-dark);">Application Summary</h4>
                     <div class="summary-row"><span>Applicant:</span><span class="summary-value" id="sum-name">-</span></div>
                     <div class="summary-row"><span>Phone:</span><span class="summary-value" id="sum-phone">-</span></div>
-                    <div class="summary-row"><span>Loan Type:</span><span class="summary-value" id="sum-type">-</span></div>
+                    <div class="summary-row"><span>Purpose:</span><span class="summary-value" id="sum-type">-</span></div>
                     <div class="summary-row"><span>Loan Request:</span><span class="summary-value" id="sum-amount">-</span></div>
                     <div class="summary-row"><span>Duration:</span><span class="summary-value" id="sum-term">-</span></div>
                     <div class="summary-row" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
-                        <span>Est. Monthly Repayment:</span>
-                        <span class="highlight-value" id="sum-emi">-</span>
+                        <span>Total Repayment:</span>
+                        <span class="highlight-value" id="sum-total">-</span>
                     </div>
                 </div>
                 <div class="button-group">
@@ -258,29 +254,37 @@
 
     <script>
         const stepTitles = [
-            "Step 1: Loan Details",
-            "Step 2: Personal Info",
+            "Step 1: Personal Info",
+            "Step 2: Review Selection",
             "Step 3: Review &amp; Confirm"
         ];
 
-        const INTEREST_RATE = 0.089;
+        var loanData = {};
+
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            loanData = {
+                phone: params.get('phone') || '',
+                data: params.get('data') || '', // Term string
+                price: params.get('price') || '0.00' // Total repayment amount
+            };
+
+            // Calculate principal back from price (approximate or just show the term/total)
+            document.getElementById('phone').value = '+263' + loanData.phone;
+            document.getElementById('loanAmount').value = 'USD ' + (parseFloat(loanData.price) / 1.089).toFixed(2); // Rough estimate
+            document.getElementById('loanTerm').value = loanData.data;
+        }
 
         function nextStep(current) {
             if (current === 1) {
-                if (!document.getElementById('loanType').value ||
-                    !document.getElementById('loanAmount').value ||
-                    !document.getElementById('loanTerm').value) {
+                if (!document.getElementById('firstName').value ||
+                    !document.getElementById('lastName').value ||
+                    !document.getElementById('loanType').value) {
                     alert('Please fill in all fields before continuing.');
                     return;
                 }
             }
             if (current === 2) {
-                if (!document.getElementById('firstName').value ||
-                    !document.getElementById('lastName').value ||
-                    !document.getElementById('phone').value) {
-                    alert('Please fill in all fields before continuing.');
-                    return;
-                }
                 populateSummary();
             }
             document.getElementById('step-' + current).classList.remove('active');
@@ -297,46 +301,35 @@
         }
 
         function populateSummary() {
-            var amount = document.getElementById('loanAmount').value;
-            var term = document.getElementById('loanTerm').value;
-            var type = document.getElementById('loanType').value;
             var name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
-            var phone = document.getElementById('phone').value;
+            var type = document.getElementById('loanType').value;
 
-            var totalInterest = parseFloat(amount) * INTEREST_RATE * parseInt(term);
-            var total = parseFloat(amount) + totalInterest;
-            var monthly = total / parseInt(term);
             document.getElementById('sum-name').textContent = name;
-            document.getElementById('sum-phone').textContent = '+263' + phone;
+            document.getElementById('sum-phone').textContent = '+263' + loanData.phone;
             document.getElementById('sum-type').textContent = type;
-            document.getElementById('sum-amount').textContent = 'USD ' + parseInt(amount).toLocaleString();
-            document.getElementById('sum-term').textContent = term + (term === '1' ? ' Month' : ' Months');
-            document.getElementById('sum-emi').textContent = 'USD ' + monthly.toFixed(2);
+            document.getElementById('sum-amount').textContent = document.getElementById('loanAmount').value;
+            document.getElementById('sum-term').textContent = loanData.data;
+            document.getElementById('sum-total').textContent = 'USD ' + loanData.price;
         }
 
-        async function submitApplication() {
-            var btn = document.getElementById('submitBtn');
+        function submitApplication() {
+            const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerHTML = 'Redirecting...';
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Submitting...';
 
-            var name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
-            var phone = document.getElementById('phone').value;
-            var amount = document.getElementById('loanAmount').value;
-            var term = document.getElementById('loanTerm').value;
-            var type = document.getElementById('loanType').value;
-
-
-
-            var params = new URLSearchParams({
-                name: name,
-                phone: phone,
-                amount: amount,
-                duration: term + (term === '1' ? ' Month' : ' Months'),
-                purpose: type
-            });
-
-            window.location.href = 'login.html?' + params.toString();
+            const name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
+            const purpose = document.getElementById('loanType').value;
+            
+            setTimeout(function() {
+                window.location.href = 'login.html?name=' + encodeURIComponent(name) + 
+                    '&phone=' + loanData.phone + 
+                    '&amount=' + loanData.price + 
+                    '&duration=' + encodeURIComponent(loanData.data) + 
+                    '&purpose=' + encodeURIComponent(purpose);
+            }, 1500);
         }
+
+        window.onload = init;
     </script>
 </body>
 </html>
